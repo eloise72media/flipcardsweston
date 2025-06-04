@@ -91,7 +91,7 @@
         div.style.zIndex = i === state.length - 1 ? 100 : i;
         div.style.transform = i === state.length - 1 ? '' : `scale(${1 - (state.length - 1 - i) * 0.02}) rotate(${(state.length - 1 - i) * 1.5}deg)`;
         div.innerHTML = `
-          <img src="${card.image}" alt="Card ${card.id}" onerror="this.src='/images/placeholder.jpg'" />
+          <img src="${card.image}" alt="Card ${card.id}" onerror="this.src='https://via.placeholder.com/220x320?text=No+Image'" />
           <div class="caption">${card.text}</div>
         `;
         deck.appendChild(div);
