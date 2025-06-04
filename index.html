@@ -1,123 +1,158 @@
-"use client"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Card Deck</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      width: 220px;
+      margin-bottom: 1rem;
+    }
+    .controls button {
+      padding: 0.5rem 1rem;
+      background-color: #d1d5db;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+    .deck-container {
+      position: relative;
+      width: 220px;
+      height: 320px;
+    }
+    .card {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 4px solid white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      background-color: white;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .card .caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-size: 0.8rem;
+      padding: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <button onclick="removeTopCard('left')">←</button>
+    <button onclick="removeTopCard('right')">→</button>
+  </div>
+  <div class="deck-container" id="deck"></div>
 
-import { useEffect, useState, useRef } from 'react'
+  <script>
+    const cardsData = [
+      { id: 1, image: 'https://www.dropbox.com/scl/fi/2ebax5135ra2cnk3hul84/0X0A2263.JPG?rlkey=bhhg457ev78ff362pscijj3tt&raw=1', text: 'Take it all in. Weston transforms into a racing warzone – and you’re in the heart of it.' },
+      { id: 2, image: 'https://www.dropbox.com/scl/fi/m7sstlw8xrjl5nr7y363m/0X0A2356NODPICS.JPG?rlkey=xkoy03eyy6s1f2wsrtbbivww9&raw=1', text: 'Bring the crew. Kids love it, dogs dig it, and there’s chaos for every age.' },
+      { id: 3, image: 'https://www.dropbox.com/scl/fi/omlyu1rmswa9igzehtpnj/7E4A0334.JPG?rlkey=zoxt94b9ueiuyw281gw8ruw7g&raw=1', text: 'Supporting the riders' },
+      { id: 4, image: 'https://www.dropbox.com/scl/fi/q1am7r5wvmmnjzshglh0c/0X0A3608NODPICS.JPG?rlkey=1h4pv8e97q0ay5j540wdch7mo&raw=1', text: 'Witness legends made. Whether they finish or just survive, every rider has a story' },
+      { id: 5, image: 'https://www.dropbox.com/scl/fi/uvqwb9qepyuom3bkzfsrb/0X0A2291.JPG?rlkey=xg978av2udtjw0v24gsl1zlfd&raw=1', text: 'Watch the victories of the young and old' },
+      { id: 6, image: 'https://www.dropbox.com/scl/fi/xk14ao40otwwavyskpdnb/0X0A4136NODPICS.JPG?rlkey=d9eas1mx2fnwn7qzsljlaiccj&raw=1', text: 'No filter needed. Every corner of Weston is a photo op. Tag us and flex your feed' },
+      { id: 7, image: 'https://www.dropbox.com/scl/fi/g15hybegm267yunihjcbm/0X0A4854NODPICS.JPG?rlkey=f7m4z6hb51uk5vineq471tju3&raw=1', text: 'Whitness the awesomeness of Danny Butler and his MTB crew' },
+      { id: 8, image: 'https://www.dropbox.com/scl/fi/u22gamf4pyxobrohmv70t/0X0A3923.JPG?rlkey=v0wb54cd2mmy8rgqc9nkhwgeh&raw=1', text: 'Share special moments' },
+      { id: 9, image: 'https://www.dropbox.com/scl/fi/hp8ytoelmym7fydch4lqy/0X0A2252.JPG?rlkey=m0lysq6p2yolcag9bdnzblz2x&raw=1', text: 'Fun for all ages' }
+    ];
 
-const cardsData = [
-  { id: 1, image: 'https://www.dropbox.com/scl/fi/2ebax5135ra2cnk3hul84/0X0A2263.JPG?rlkey=bhhg457ev78ff362pscijj3tt&raw=1', text: 'Take it all in. Weston transforms into a racing warzone – and you’re in the heart of it.' },
-  { id: 2, image: 'https://www.dropbox.com/scl/fi/m7sstlw8xrjl5nr7y363m/0X0A2356NODPICS.JPG?rlkey=xkoy03eyy6s1f2wsrtbbivww9&raw=1', text: 'Bring the crew. Kids love it, dogs dig it, and there’s chaos for every age.' },
-  { id: 3, image: 'https://www.dropbox.com/scl/fi/omlyu1rmswa9igzehtpnj/7E4A0334.JPG?rlkey=zoxt94b9ueiuyw281gw8ruw7g&raw=1', text: 'Supporting the riders' },
-  { id: 4, image: 'https://www.dropbox.com/scl/fi/q1am7r5wvmmnjzshglh0c/0X0A3608NODPICS.JPG?rlkey=1h4pv8e97q0ay5j540wdch7mo&raw=1', text: 'Witness legends made. Whether they finish or just survive, every rider has a story' },
-  { id: 5, image: 'https://www.dropbox.com/scl/fi/uvqwb9qepyuom3bkzfsrb/0X0A2291.JPG?rlkey=xg978av2udtjw0v24gsl1zlfd&raw=1', text: 'Watch the victories of the young and old' },
-  { id: 6, image: 'https://www.dropbox.com/scl/fi/xk14ao40otwwavyskpdnb/0X0A4136NODPICS.JPG?rlkey=d9eas1mx2fnwn7qzsljlaiccj&raw=1', text: 'No filter needed. Every corner of Weston is a photo op. Tag us and flex your feed' },
-  { id: 7, image: 'https://www.dropbox.com/scl/fi/g15hybegm267yunihjcbm/0X0A4854NODPICS.JPG?rlkey=f7m4z6hb51uk5vineq471tju3&raw=1', text: 'Whitness the awesomeness of Danny Butler and his MTB crew' },
-  { id: 8, image: 'https://www.dropbox.com/scl/fi/u22gamf4pyxobrohmv70t/0X0A3923.JPG?rlkey=v0wb54cd2mmy8rgqc9nkhwgeh&raw=1', text: 'Share special moments' },
-  { id: 9, image: 'https://www.dropbox.com/scl/fi/hp8ytoelmym7fydch4lqy/0X0A2252.JPG?rlkey=m0lysq6p2yolcag9bdnzblz2x&raw=1', text: 'Fun for all ages' }
-]
+    const deck = document.getElementById('deck');
 
-export default function CardDeck() {
-  const [cards, setCards] = useState(cardsData)
-  const containerRef = useRef(null)
+    let state = [...cardsData];
 
-  const removeTopCard = (direction) => {
-    const topCard = document.getElementById(`card-${cards[cards.length - 1].id}`)
-    if (!topCard) return
-
-    topCard.style.transition = 'transform 0.4s ease, opacity 0.4s ease'
-    topCard.style.transform = `translateX(${direction === 'left' ? '-' : ''}150%) rotate(${direction === 'left' ? '-' : ''}20deg)`
-    topCard.style.opacity = '0'
-
-    setTimeout(() => {
-      setCards((prev) => prev.slice(0, -1))
-    }, 400)
-  }
-
-  useEffect(() => {
-    const container = containerRef.current
-    let activeCard = null
-    let startX = 0
-
-    const handleMouseDown = (e) => {
-      const card = e.target.closest('.card')
-      if (card && container.contains(card)) {
-        activeCard = card
-        startX = e.clientX
-        activeCard.style.transition = 'none'
-      }
+    function renderCards() {
+      deck.innerHTML = '';
+      state.forEach((card, i) => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.id = `card-${card.id}`;
+        div.style.zIndex = i === state.length - 1 ? 100 : i;
+        div.style.transform = i === state.length - 1 ? '' : `scale(${1 - (state.length - 1 - i) * 0.02}) rotate(${(state.length - 1 - i) * 1.5}deg)`;
+        div.innerHTML = `
+          <img src="${card.image}" alt="Card ${card.id}" onerror="this.src='/images/placeholder.jpg'" />
+          <div class="caption">${card.text}</div>
+        `;
+        deck.appendChild(div);
+      });
     }
 
-    const handleMouseMove = (e) => {
-      if (activeCard) {
-        const offset = e.clientX - startX
-        activeCard.style.transform = `translateX(${offset}px) rotate(${offset / 10}deg)`
-      }
+    function removeTopCard(direction) {
+      if (state.length === 0) return;
+      const card = document.getElementById(`card-${state[state.length - 1].id}`);
+      if (!card) return;
+
+      card.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+      card.style.transform = `translateX(${direction === 'left' ? '-' : ''}150%) rotate(${direction === 'left' ? '-' : ''}20deg)`;
+      card.style.opacity = '0';
+
+      setTimeout(() => {
+        state.pop();
+        renderCards();
+      }, 400);
     }
 
-    const handleMouseUp = (e) => {
+    let activeCard = null;
+    let startX = 0;
+
+    deck.addEventListener('mousedown', (e) => {
+      const card = e.target.closest('.card');
+      if (card && deck.contains(card)) {
+        activeCard = card;
+        startX = e.clientX;
+        activeCard.style.transition = 'none';
+      }
+    });
+
+    deck.addEventListener('mousemove', (e) => {
       if (activeCard) {
-        const offset = e.clientX - startX
+        const offset = e.clientX - startX;
+        activeCard.style.transform = `translateX(${offset}px) rotate(${offset / 10}deg)`;
+      }
+    });
+
+    deck.addEventListener('mouseup', (e) => {
+      if (activeCard) {
+        const offset = e.clientX - startX;
         if (Math.abs(offset) > 100) {
-          activeCard.style.transition = 'transform 0.4s ease, opacity 0.4s ease'
-          activeCard.style.transform = `translateX(${offset > 0 ? '150%' : '-150%'}) rotate(${offset > 0 ? '20' : '-20'}deg)`
-          activeCard.style.opacity = '0'
-          const cardId = activeCard.getAttribute('id')
+          activeCard.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+          activeCard.style.transform = `translateX(${offset > 0 ? '150%' : '-150%'}) rotate(${offset > 0 ? '20' : '-20'}deg)`;
+          activeCard.style.opacity = '0';
+          const cardId = activeCard.id;
           setTimeout(() => {
-            setCards((prev) => prev.filter((c) => `card-${c.id}` !== cardId))
-          }, 400)
+            state = state.filter((c) => `card-${c.id}` !== cardId);
+            renderCards();
+          }, 400);
         } else {
-          activeCard.style.transition = 'transform 0.4s ease'
-          activeCard.style.transform = 'translateX(0) rotate(0)'
+          activeCard.style.transition = 'transform 0.4s ease';
+          activeCard.style.transform = 'translateX(0) rotate(0)';
         }
-        activeCard = null
+        activeCard = null;
       }
-    }
+    });
 
-    container.addEventListener('mousedown', handleMouseDown)
-    container.addEventListener('mousemove', handleMouseMove)
-    container.addEventListener('mouseup', handleMouseUp)
-
-    return () => {
-      container.removeEventListener('mousedown', handleMouseDown)
-      container.removeEventListener('mousemove', handleMouseMove)
-      container.removeEventListener('mouseup', handleMouseUp)
-    }
-  }, [cards])
-
-  return (
-    <div className="flex flex-col items-center">
-      <div className="flex justify-between w-full max-w-xs mb-4">
-        <button onClick={() => removeTopCard('left')} className="px-4 py-2 bg-gray-300 rounded">←</button>
-        <button onClick={() => removeTopCard('right')} className="px-4 py-2 bg-gray-300 rounded">→</button>
-      </div>
-      <div
-        ref={containerRef}
-        className="relative w-[220px] h-[320px]"
-      >
-        {cards.map((card, i) => (
-          <div
-            key={card.id}
-            id={`card-${card.id}`}
-            className="card absolute w-full h-full border-4 border-white rounded-xl shadow-lg bg-white overflow-hidden cursor-pointer"
-            style={{
-              zIndex: i === cards.length - 1 ? 100 : i,
-              transform: i === cards.length - 1 ? undefined : `scale(${1 - (cards.length - 1 - i) * 0.02}) rotate(${(cards.length - 1 - i) * 1.5}deg)`
-            }}
-          >
-            <div className="w-full h-full absolute inset-0">
-              <img
-                src={card.image}
-                alt={`Card ${card.id}`}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = '/images/placeholder.jpg'
-                }}
-              />
-              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-sm p-2">
-                {card.text}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
+    renderCards();
+  </script>
+</body>
+</html>
