@@ -1,77 +1,122 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Card, CardContent } from '@/components/ui/card'
+"use client"
 
-const initialCards = [
-  { id: 1, image: 'https://dl.dropboxusercontent.com/scl/fi/2ebax5135ra2cnk3hul84/0X0A2263.JPG?rlkey=bhhg457ev78ff362pscijj3tt&st=ycnc5s5k&dl', text: 'Take it all in. Weston transforms into a racing warzone – and you’re in the heart of it.' },
-  { id: 2, image: 'https://dl.dropboxusercontent.com/scl/fi/m7sstlw8xrjl5nr7y363m/0X0A2356NODPICS.JPG?rlkey=xkoy03eyy6s1f2wsrtbbivww9&st=r01b1euk&dl', text: 'Bring the crew. Kids love it, dogs dig it, and there’s chaos for every age.' },
-  { id: 3, image: 'https://dl.dropboxusercontent.com/scl/fi/omlyu1rmswa9igzehtpnj/7E4A0334.JPG?rlkey=zoxt94b9ueiuyw281gw8ruw7g&st=wgzlb67c&dl', text: 'Supporting the riders' },
-  { id: 4, image: 'https://dl.dropboxusercontent.com/scl/fi/q1am7r5wvmmnjzshglh0c/0X0A3608NODPICS.JPG?rlkey=1h4pv8e97q0ay5j540wdch7mo&st=vwsnj3jq&dl', text: 'Witness legends made. Whether they finish or just survive, every rider has a story' },
-  { id: 5, image: 'https://dl.dropboxusercontent.com/scl/fi/uvqwb9qepyuom3bkzfsrb/0X0A2291.JPG?rlkey=xg978av2udtjw0v24gsl1zlfd&st=kcgtw3jz&dl', text: 'Watch the victories of the young and old' },
-  { id: 6, image: 'https://dl.dropboxusercontent.com/scl/fi/xk14ao40otwwavyskpdnb/0X0A4136NODPICS.JPG?rlkey=d9eas1mx2fnwn7qzsljlaiccj&st=58zowj3d&dl', text: 'No filter needed. Every corner of Weston is a photo op. Tag us and flex your feed' },
-  { id: 7, image: 'https://dl.dropboxusercontent.com/scl/fi/g15hybegm267yunihjcbm/0X0A4854NODPICS.JPG?rlkey=f7m4z6hb51uk5vineq471tju3&st=yyis8f1y&dl', text: 'Whitness the awesomeness of Danny Butler and his MTB crew' },
-  { id: 8, image: 'https://dl.dropboxusercontent.com/scl/fi/u22gamf4pyxobrohmv70t/0X0A3923.JPG?rlkey=v0wb54cd2mmy8rgqc9nkhwgeh&st=nx0r6bjq&dl', text: 'Share special moments' },
-  { id: 9, image: 'https://dl.dropboxusercontent.com/scl/fi/hp8ytoelmym7fydch4lqy/0X0A2252.JPG?rlkey=m0lysq6p2yolcag9bdnzblz2x&st=g2tk39xw&dl', text: 'Fun for all ages' },
+import { useEffect, useState, useRef } from 'react'
+
+const cardsData = [
+  { id: 1, image: 'https://www.dropbox.com/scl/fi/2ebax5135ra2cnk3hul84/0X0A2263.JPG?rlkey=bhhg457ev78ff362pscijj3tt&raw=1', text: 'Take it all in. Weston transforms into a racing warzone – and you’re in the heart of it.' },
+  { id: 2, image: 'https://www.dropbox.com/scl/fi/m7sstlw8xrjl5nr7y363m/0X0A2356NODPICS.JPG?rlkey=xkoy03eyy6s1f2wsrtbbivww9&raw=1', text: 'Bring the crew. Kids love it, dogs dig it, and there’s chaos for every age.' },
+  { id: 3, image: 'https://www.dropbox.com/scl/fi/omlyu1rmswa9igzehtpnj/7E4A0334.JPG?rlkey=zoxt94b9ueiuyw281gw8ruw7g&raw=1', text: 'Supporting the riders' },
+  { id: 4, image: 'https://www.dropbox.com/scl/fi/q1am7r5wvmmnjzshglh0c/0X0A3608NODPICS.JPG?rlkey=1h4pv8e97q0ay5j540wdch7mo&raw=1', text: 'Witness legends made. Whether they finish or just survive, every rider has a story' },
+  { id: 5, image: 'https://www.dropbox.com/scl/fi/uvqwb9qepyuom3bkzfsrb/0X0A2291.JPG?rlkey=xg978av2udtjw0v24gsl1zlfd&raw=1', text: 'Watch the victories of the young and old' },
+  { id: 6, image: 'https://www.dropbox.com/scl/fi/xk14ao40otwwavyskpdnb/0X0A4136NODPICS.JPG?rlkey=d9eas1mx2fnwn7qzsljlaiccj&raw=1', text: 'No filter needed. Every corner of Weston is a photo op. Tag us and flex your feed' },
+  { id: 7, image: 'https://www.dropbox.com/scl/fi/g15hybegm267yunihjcbm/0X0A4854NODPICS.JPG?rlkey=f7m4z6hb51uk5vineq471tju3&raw=1', text: 'Whitness the awesomeness of Danny Butler and his MTB crew' },
+  { id: 8, image: 'https://www.dropbox.com/scl/fi/u22gamf4pyxobrohmv70t/0X0A3923.JPG?rlkey=v0wb54cd2mmy8rgqc9nkhwgeh&raw=1', text: 'Share special moments' },
+  { id: 9, image: 'https://www.dropbox.com/scl/fi/hp8ytoelmym7fydch4lqy/0X0A2252.JPG?rlkey=m0lysq6p2yolcag9bdnzblz2x&raw=1', text: 'Fun for all ages' }
 ]
 
-export default function MultiCardDeck() {
-  const [cards, setCards] = useState(initialCards)
+export default function CardDeck() {
+  const [cards, setCards] = useState(cardsData)
+  const containerRef = useRef(null)
 
-  const handleFlick = (id) => {
-    setCards((prev) => prev.filter((card) => card.id !== id))
+  const removeTopCard = (direction) => {
+    const topCard = document.getElementById(`card-${cards[cards.length - 1].id}`)
+    if (!topCard) return
+
+    topCard.style.transition = 'transform 0.4s ease, opacity 0.4s ease'
+    topCard.style.transform = `translateX(${direction === 'left' ? '-' : ''}150%) rotate(${direction === 'left' ? '-' : ''}20deg)`
+    topCard.style.opacity = '0'
+
+    setTimeout(() => {
+      setCards((prev) => prev.slice(0, -1))
+    }, 400)
   }
 
+  useEffect(() => {
+    const container = containerRef.current
+    let activeCard = null
+    let startX = 0
+
+    const handleMouseDown = (e) => {
+      const card = e.target.closest('.card')
+      if (card && container.contains(card)) {
+        activeCard = card
+        startX = e.clientX
+        activeCard.style.transition = 'none'
+      }
+    }
+
+    const handleMouseMove = (e) => {
+      if (activeCard) {
+        const offset = e.clientX - startX
+        activeCard.style.transform = `translateX(${offset}px) rotate(${offset / 10}deg)`
+      }
+    }
+
+    const handleMouseUp = (e) => {
+      if (activeCard) {
+        const offset = e.clientX - startX
+        if (Math.abs(offset) > 100) {
+          activeCard.style.transition = 'transform 0.4s ease, opacity 0.4s ease'
+          activeCard.style.transform = `translateX(${offset > 0 ? '150%' : '-150%'}) rotate(${offset > 0 ? '20' : '-20'}deg)`
+          activeCard.style.opacity = '0'
+          const cardId = activeCard.getAttribute('id')
+          setTimeout(() => {
+            setCards((prev) => prev.filter((c) => `card-${c.id}` !== cardId))
+          }, 400)
+        } else {
+          activeCard.style.transition = 'transform 0.4s ease'
+          activeCard.style.transform = 'translateX(0) rotate(0)'
+        }
+        activeCard = null
+      }
+    }
+
+    container.addEventListener('mousedown', handleMouseDown)
+    container.addEventListener('mousemove', handleMouseMove)
+    container.addEventListener('mouseup', handleMouseUp)
+
+    return () => {
+      container.removeEventListener('mousedown', handleMouseDown)
+      container.removeEventListener('mousemove', handleMouseMove)
+      container.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [cards])
+
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="relative w-[220px] h-[320px]">
-        <AnimatePresence>
-          {cards.map((card, index) => {
-            const offset = (cards.length - index) * 2
-            const scale = 1 - (cards.length - index) * 0.02
-            return (
-              <motion.div
-                key={card.id}
-                layout
-                drag="x"
-                onDragEnd={(e, info) => {
-                  if (Math.abs(info.offset.x) > 100) handleFlick(card.id)
+    <div className="flex flex-col items-center">
+      <div className="flex justify-between w-full max-w-xs mb-4">
+        <button onClick={() => removeTopCard('left')} className="px-4 py-2 bg-gray-300 rounded">←</button>
+        <button onClick={() => removeTopCard('right')} className="px-4 py-2 bg-gray-300 rounded">→</button>
+      </div>
+      <div
+        ref={containerRef}
+        className="relative w-[220px] h-[320px]"
+      >
+        {cards.map((card, i) => (
+          <div
+            key={card.id}
+            id={`card-${card.id}`}
+            className="card absolute w-full h-full border-4 border-white rounded-xl shadow-lg bg-white overflow-hidden cursor-pointer"
+            style={{
+              zIndex: i === cards.length - 1 ? 100 : i,
+              transform: i === cards.length - 1 ? undefined : `scale(${1 - (cards.length - 1 - i) * 0.02}) rotate(${(cards.length - 1 - i) * 1.5}deg)`
+            }}
+          >
+            <div className="w-full h-full absolute inset-0">
+              <img
+                src={card.image}
+                alt={`Card ${card.id}`}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = '/images/placeholder.jpg'
                 }}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  scale: scale,
-                  rotate: (cards.length - index) * 1.5,
-                  zIndex: cards.length - index
-                }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="absolute w-full h-full cursor-pointer border-4 border-white rounded-xl shadow-lg"
-              >
-                <Card className="w-full h-full overflow-hidden">
-                  <CardContent className="p-0 w-full h-full relative">
-                    {card.image ? (
-                      <img
-                        src={card.image}
-                        alt={`Card ${card.id}`}
-                        className="w-full h-full object-cover absolute inset-0"
-                        onError={(e) => {
-                          e.currentTarget.src = '/images/placeholder.jpg'
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-200 absolute inset-0 flex items-center justify-center text-gray-500">
-                        No Image
-                      </div>
-                    )}
-                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-sm p-2">
-                      {card.text}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )
-          })}
-        </AnimatePresence>
+              />
+              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-sm p-2">
+                {card.text}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )
